@@ -1,30 +1,27 @@
-import reactLogo from '@/assets/react.svg';
-import { useState } from 'react';
-import wxtLogo from '/wxt.svg';
-import './App.css';
-
 function App() {
-  const [count, setCount] = useState(0);
+  const handler = async () => {
+    const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+    console.log(tabs);
+
+    for (const tab of tabs) {
+      if (!tab.id) {
+        continue;
+      }
+      const r = await browser.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['/content-scripts/content.js'],
+      });
+      console.log('popup runscript: ', r);
+
+      const response = await browser.tabs.sendMessage(tab.id, 'from popup');
+      console.log('popup message received: ', response);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://wxt.dev" target="_blank" rel="noreferrer">
-          <img src={wxtLogo} className="logo" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>WXT + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the WXT and React logos to learn more</p>
-    </>
+    <button type="button" onClick={handler}>
+      Click!
+    </button>
   );
 }
 
