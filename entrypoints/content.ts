@@ -1,36 +1,32 @@
 declare global {
   interface Window {
-    extVoiceFocus?: string;
+    extVoiceFocus?: WeakMap<HTMLMediaElement, string>;
   }
 }
 
-export type ContentScriptState = {
-  type: 'state';
-  state: 'pending' | 'running' | 'finished';
+const getPlayableElements = () => {
+  return Array.from(document.querySelectorAll<HTMLMediaElement>('video, audio'));
 };
 
 export default defineContentScript({
   registration: 'runtime',
   matches: [],
-  async main(): Promise<ContentScriptState> {
-    const playableElements = Array.from(document.querySelectorAll('video, audio'));
-    if (playableElements.length === 0) {
-      return { type: 'state', state: 'pending' };
+  async main(): Promise<VoiceFocusState> {
+    if (window.extVoiceFocus) {
+      return { state: 'active', params: [] };
     }
 
-    if (window.extVoiceFocus) {
-      return { type: 'state', state: 'running' };
-    }
-    window.extVoiceFocus = 'running';
+    window.extVoiceFocus = new WeakMap();
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      console.log('contentscript message received: ', message);
-      sendResponse('from contentscript');
-
+      if (!isVoiceFocusCommand(message)) {
+        return;
+      }
+      console.log(message);
+      sendResponse('');
       return false;
     });
 
-    console.log('Running content script...');
-    return { type: 'state', state: 'running' };
+    return { state: 'ready' };
   },
 });
