@@ -1,6 +1,3 @@
-import type { VoiceFocusAction } from '@/utils/types';
-import type React from 'react';
-import { useCallback } from 'react';
 import { getCurrentTabId } from './activeTab';
 
 type Props = {
@@ -8,22 +5,25 @@ type Props = {
 };
 
 function Pan({ pan }: Props) {
-  const onInput = useCallback<React.FormEventHandler<HTMLInputElement>>(async (ev) => {
-    const { target } = ev;
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = async (ev) => {
+    const target = ev.target;
     if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+    const value = Number(target.value);
+    if (Number.isNaN(value)) {
       return;
     }
 
     const currentTabId = await getCurrentTabId();
-    const message: VoiceFocusAction = {
+    await browser.tabs.sendMessage<VoiceFocusAction>(currentTabId, {
       action: 'apply',
-      option: { type: 'pan', value: Number(target.value) },
-    };
-    await browser.tabs.sendMessage(currentTabId, message);
-  }, []);
+      option: { type: 'pan', value },
+    });
+  };
 
   return (
-    <div className="voicefocus container">
+    <div className="container">
       <label htmlFor="pan">Panner:</label>
       <input
         type="range"
@@ -33,10 +33,12 @@ function Pan({ pan }: Props) {
         step={0.1}
         list="default-pan"
         defaultValue={pan ?? 0.0}
-        onInput={onInput}
+        onChange={onChange}
       />
       <datalist id="default-pan">
-        <option value="0.0" />
+        <option value={-0.5} />
+        <option value={0.0} />
+        <option value={0.5} />
       </datalist>
     </div>
   );
