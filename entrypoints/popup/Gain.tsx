@@ -1,6 +1,3 @@
-import type { VoiceFocusAction } from '@/utils/types';
-import type React from 'react';
-import { useCallback } from 'react';
 import { getCurrentTabId } from './activeTab';
 
 type Props = {
@@ -8,35 +5,38 @@ type Props = {
 };
 
 function Gain({ gain }: Props) {
-  const onInput = useCallback<React.FormEventHandler<HTMLInputElement>>(async (ev) => {
-    const { target } = ev;
+  const onChange: React.FormEventHandler<HTMLInputElement> = async (ev) => {
+    const target = ev.target;
     if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+    const value = Number(target.value);
+    if (Number.isNaN(value)) {
       return;
     }
 
     const currentTabId = await getCurrentTabId();
-    const message: VoiceFocusAction = {
+    await browser.tabs.sendMessage<VoiceFocusAction>(currentTabId, {
       action: 'apply',
-      option: { type: 'gain', value: Number(target.value) },
-    };
-    const response = await browser.tabs.sendMessage(currentTabId, message);
-  }, []);
+      option: { type: 'gain', value },
+    });
+  };
 
   return (
-    <div className="voicefocus container">
+    <div className="container">
       <label htmlFor="gain">Gain:</label>
       <input
         type="range"
         id="gain"
         min={0.0}
         max={2.0}
-        step={0.05}
+        step={0.1}
         list="default-gain"
         defaultValue={gain ?? 1.0}
-        onInput={onInput}
+        onChange={onChange}
       />
       <datalist id="default-gain">
-        <option value="1.0" />
+        <option value={1.0} />
       </datalist>
     </div>
   );
