@@ -76,8 +76,9 @@ export default defineContentScript({
         for (const key of keys) {
           const value = window.extVoiceFocus.get(key);
           if (value) {
-            value.context.close().catch(console.error);
-            window.extVoiceFocus.delete(key);
+            value.gainNode.gain.value = 1.0;
+            value.pannerNode.pan.value = 0.0;
+            value.options = [];
           }
         }
       }
