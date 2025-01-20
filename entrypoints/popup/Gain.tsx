@@ -5,7 +5,7 @@ type Props = {
 };
 
 function Gain({ gain }: Props) {
-  const onChange: React.FormEventHandler<HTMLInputElement> = async (ev) => {
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = async (ev) => {
     const target = ev.target;
     if (!(target instanceof HTMLInputElement)) {
       return;
