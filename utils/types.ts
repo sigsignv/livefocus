@@ -1,12 +1,12 @@
-export type VoiceFocusState = VoiceFocusReady | VoiceFocusActive;
+export type VoiceFocusState = VoiceFocusReadyState | VoiceFocusActiveState;
 
-type VoiceFocusReady = {
+type VoiceFocusReadyState = {
   state: 'ready';
 };
 
-type VoiceFocusActive = {
+type VoiceFocusActiveState = {
   state: 'active';
-  params: VoiceFocusParams[];
+  options: VoiceFocusOption[];
 };
 
 export function isVoiceFocusState(obj: unknown): obj is VoiceFocusState {
@@ -16,34 +16,27 @@ export function isVoiceFocusState(obj: unknown): obj is VoiceFocusState {
   return Object.hasOwn(obj, 'state');
 }
 
-export type VoiceFocusCommand = VoiceFocusApply | VoiceFocusReset;
+export type VoiceFocusAction = VoiceFocusApplyAction | VoiceFocusResetAction;
 
-type VoiceFocusApply = {
-  command: 'apply';
-  params: VoiceFocusParams[];
+type VoiceFocusApplyAction = {
+  action: 'apply';
+  option: VoiceFocusOption;
 };
 
-type VoiceFocusReset = {
-  command: 'reset';
+type VoiceFocusResetAction = {
+  action: 'reset';
 };
 
-export function isVoiceFocusCommand(obj: unknown): obj is VoiceFocusCommand {
+export function isVoiceFocusAction(obj: unknown): obj is VoiceFocusAction {
   if (typeof obj !== 'object' || obj === null) {
     return false;
   }
-  return Object.hasOwn(obj, 'command');
+  return Object.hasOwn(obj, 'action');
 }
 
-export type VoiceFocusParams = VoiceFocusGain;
+export type VoiceFocusOption = VoiceFocusGain;
 
 type VoiceFocusGain = {
   type: 'gain';
   value: number;
 };
-
-export function isVoiceFocusParameter(obj: unknown): obj is VoiceFocusParams {
-  if (typeof obj !== 'object' || obj === null) {
-    return false;
-  }
-  return Object.hasOwn(obj, 'type');
-}

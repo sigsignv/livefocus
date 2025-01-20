@@ -1,4 +1,4 @@
-import type { VoiceFocusCommand } from '@/utils/types';
+import type { VoiceFocusAction } from '@/utils/types';
 import type React from 'react';
 import { useCallback } from 'react';
 import { getCurrentTabId } from './activeTab';
@@ -15,9 +15,9 @@ function Gain({ gain }: Props) {
     }
 
     const currentTabId = await getCurrentTabId();
-    const message: VoiceFocusCommand = {
-      command: 'apply',
-      params: [{ type: 'gain', value: Number(target.value) }],
+    const message: VoiceFocusAction = {
+      action: 'apply',
+      option: { type: 'gain', value: Number(target.value) },
     };
     const response = await browser.tabs.sendMessage(currentTabId, message);
   }, []);
