@@ -1,11 +1,18 @@
 import Gain from './Gain';
+import Pan from './Pan';
 
 type Props = {
   gain?: number;
+  pan?: number;
 };
 
-function App({ gain }: Props) {
-  return <Gain />;
+function App({ gain, pan }: Props) {
+  return (
+    <>
+      <Gain />
+      <Pan />
+    </>
+  );
 }
 
 export default App;

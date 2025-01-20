@@ -9,6 +9,7 @@ type VoiceFocusMap = WeakMap<HTMLMediaElement, VoiceFocusConfig>;
 type VoiceFocusConfig = {
   context: AudioContext;
   gainNode: GainNode;
+  pannerNode: StereoPannerNode;
   sourceNode: MediaElementAudioSourceNode;
 
   options: VoiceFocusOption[];
@@ -26,14 +27,17 @@ const getVoiceFocusConfig = (key: HTMLMediaElement) => {
 
   const ctx = new AudioContext();
   const gainNode = ctx.createGain();
+  const pannerNode = ctx.createStereoPanner();
   const sourceNode = ctx.createMediaElementSource(key);
 
   sourceNode.connect(gainNode);
-  gainNode.connect(ctx.destination);
+  gainNode.connect(pannerNode);
+  pannerNode.connect(ctx.destination);
 
   return {
     context: ctx,
     gainNode,
+    pannerNode,
     sourceNode,
 
     options: [],
@@ -73,11 +77,16 @@ export default defineContentScript({
       }
 
       if (message.action === 'apply') {
+        console.log(message);
         for (const key of keys) {
           const config = getVoiceFocusConfig(key);
 
           if (message.option.type === 'gain') {
             config.gainNode.gain.value = message.option.value;
+          }
+
+          if (message.option.type === 'pan') {
+            config.pannerNode.pan.value = message.option.value;
           }
 
           config.options = config.options.filter((option) => {
