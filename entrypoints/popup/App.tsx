@@ -9,8 +9,8 @@ type Props = {
 function App({ gain, pan }: Props) {
   return (
     <>
-      <Gain />
-      <Pan />
+      <Gain gain={gain} />
+      <Pan pan={pan} />
     </>
   );
 }

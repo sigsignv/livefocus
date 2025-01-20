@@ -49,6 +49,12 @@ export default defineContentScript({
   matches: [],
   async main(): Promise<VoiceFocusState> {
     if (window.extVoiceFocus) {
+      const keys = getPlayableElements();
+      for (const key of keys) {
+        const config = getVoiceFocusConfig(key);
+        return { state: 'active', options: config.options };
+      }
+
       return { state: 'active', options: [] };
     }
 
