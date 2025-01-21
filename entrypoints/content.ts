@@ -6,55 +6,112 @@ declare global {
 
 type VoiceFocusMap = WeakMap<HTMLMediaElement, VoiceFocusConfig>;
 
-type VoiceFocusConfig = {
-  context: AudioContext;
-  gainNode: GainNode;
-  pannerNode: StereoPannerNode;
-  sourceNode: MediaElementAudioSourceNode;
-
-  options: VoiceFocusOption[];
+const createMediaElementSource = (ctx: AudioContext, media: HTMLMediaElement) => {
+  return new Promise<MediaElementAudioSourceNode>((resolv, reject) => {
+    const listener = (ev: Event) => {
+      try {
+        resolv(ctx.createMediaElementSource(ev.target as HTMLMediaElement));
+      } catch (ex) {
+        reject(ex);
+      }
+    };
+    media.addEventListener('timeupdate', listener, { once: true });
+  });
 };
 
 const getPlayableElements = () => {
   return Array.from(document.querySelectorAll<HTMLMediaElement>('video, audio'));
 };
 
-const getVoiceFocusConfig = (key: HTMLMediaElement) => {
-  const value = window.extVoiceFocus.get(key);
-  if (value) {
-    return value;
+class VoiceFocusConfig {
+  context: AudioContext;
+  gainNode: GainNode;
+  pannerNode: StereoPannerNode;
+  source?: MediaElementAudioSourceNode;
+
+  options: VoiceFocusOption[];
+  isEnabled: boolean;
+
+  constructor(media: HTMLMediaElement) {
+    this.context = new AudioContext();
+    this.gainNode = this.context.createGain();
+    this.pannerNode = this.context.createStereoPanner();
+
+    createMediaElementSource(this.context, media)
+      .then((source) => {
+        this.source = source;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    this.options = [];
+    this.isEnabled = false;
   }
 
-  const ctx = new AudioContext();
-  const gainNode = ctx.createGain();
-  const pannerNode = ctx.createStereoPanner();
-  const sourceNode = ctx.createMediaElementSource(key);
+  apply(option: VoiceFocusOption) {
+    this.options = this.options.filter((o) => o.type !== option.type);
 
-  sourceNode.connect(gainNode);
-  gainNode.connect(pannerNode);
-  pannerNode.connect(ctx.destination);
+    if (option.type === 'gain') {
+      this.gainNode.gain.value = option.value;
+    }
+    if (option.type === 'pan') {
+      this.pannerNode.pan.value = option.value;
+    }
 
-  return {
-    context: ctx,
-    gainNode,
-    pannerNode,
-    sourceNode,
+    this.options.push(option);
+  }
 
-    options: [],
-  };
-};
+  enable() {
+    if (!this.source) {
+      return;
+    }
+
+    for (const option of this.options) {
+      this.apply(option);
+    }
+
+    if (!this.isEnabled) {
+      this.source.disconnect();
+      this.source.connect(this.gainNode);
+      this.gainNode.connect(this.pannerNode);
+      this.pannerNode.connect(this.context.destination);
+      this.isEnabled = true;
+    }
+  }
+
+  disable() {
+    if (!this.source) {
+      return;
+    }
+
+    if (this.isEnabled) {
+      this.source.disconnect();
+      this.source.connect(this.context.destination);
+      this.gainNode.disconnect();
+      this.pannerNode.disconnect();
+      this.isEnabled = false;
+    }
+  }
+
+  reset() {
+    this.gainNode.gain.value = 1.0;
+    this.pannerNode.pan.value = 0.0;
+    this.options = [];
+  }
+}
 
 export default defineContentScript({
   registration: 'runtime',
   matches: [],
   async main(): Promise<VoiceFocusState> {
     if (window.extVoiceFocus) {
-      const keys = getPlayableElements();
-      for (const key of keys) {
-        const config = getVoiceFocusConfig(key);
-        return { state: 'active', options: config.options };
+      for (const key of getPlayableElements()) {
+        const config = window.extVoiceFocus.get(key);
+        if (config) {
+          return { state: 'active', options: config.options };
+        }
       }
-
       return { state: 'active', options: [] };
     }
 
@@ -62,7 +119,6 @@ export default defineContentScript({
 
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (!sender.id || sender.id !== browser.runtime.id) {
-        console.log('id is not match');
         return;
       }
       if (!isVoiceFocusAction(message)) {
@@ -70,43 +126,24 @@ export default defineContentScript({
         return;
       }
 
-      const keys = getPlayableElements();
-
       if (message.action === 'reset') {
-        for (const key of keys) {
-          const value = window.extVoiceFocus.get(key);
-          if (value) {
-            value.gainNode.gain.value = 1.0;
-            value.pannerNode.pan.value = 0.0;
-            value.options = [];
+        for (const key of getPlayableElements()) {
+          const config = window.extVoiceFocus.get(key);
+          if (config) {
+            config.disable();
+            config.reset();
           }
         }
       }
 
       if (message.action === 'apply') {
-        console.log(message);
-        for (const key of keys) {
-          const config = getVoiceFocusConfig(key);
-
-          if (message.option.type === 'gain') {
-            config.gainNode.gain.value = message.option.value;
-          }
-
-          if (message.option.type === 'pan') {
-            config.pannerNode.pan.value = message.option.value;
-          }
-
-          config.options = config.options.filter((option) => {
-            return option.type !== message.option.type;
-          });
-          config.options.push(message.option);
-
+        for (const key of getPlayableElements()) {
+          const config = window.extVoiceFocus.get(key) ?? new VoiceFocusConfig(key);
+          config.apply(message.option);
+          config.enable();
           window.extVoiceFocus.set(key, config);
         }
       }
-
-      sendResponse('');
-      return false;
     });
 
     return { state: 'ready' };
