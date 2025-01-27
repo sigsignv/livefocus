@@ -44,6 +44,7 @@ class VoiceFocusConfig {
 
     createMediaElementSource(this.context, media)
       .then((source) => {
+        source.connect(this.context.destination);
         this.source = source;
       })
       .catch((err) => {
