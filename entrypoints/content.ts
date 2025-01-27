@@ -81,10 +81,12 @@ class VoiceFocusConfig {
 
     if (!this.isEnabled) {
       this.source.disconnect();
-      this.source.connect(this.compressorNode);
-      this.compressorNode.connect(this.gainNode);
-      this.gainNode.connect(this.pannerNode);
-      this.pannerNode.connect(this.context.destination);
+
+      let lastNode: AudioNode = this.source;
+      for (const node of this.getAudioNodes()) {
+        lastNode = lastNode.connect(node);
+      }
+      lastNode.connect(this.context.destination);
       this.isEnabled = true;
     }
   }
@@ -97,11 +99,18 @@ class VoiceFocusConfig {
     if (this.isEnabled) {
       this.source.disconnect();
       this.source.connect(this.context.destination);
-      this.compressorNode.disconnect();
-      this.gainNode.disconnect();
-      this.pannerNode.disconnect();
+
+      for (const node of this.getAudioNodes()) {
+        node.disconnect();
+      }
       this.isEnabled = false;
     }
+  }
+
+  getAudioNodes(): AudioNode[] {
+    const nodes = [this.compressorNode, this.gainNode, this.pannerNode];
+
+    return nodes;
   }
 
   reset() {
