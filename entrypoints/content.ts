@@ -71,6 +71,36 @@ class VoiceFocusConfig {
     this.options.push(option);
   }
 
+  connect() {
+    if (!this.source) {
+      return;
+    }
+
+    // Reset connections between all AudioNodes
+    this.disconnect();
+    this.source.disconnect();
+
+    let lastNode: AudioNode = this.source;
+    for (const node of this.getAudioNodes()) {
+      lastNode = lastNode.connect(node);
+    }
+    lastNode.connect(this.context.destination);
+  }
+
+  disconnect() {
+    if (!this.source) {
+      return;
+    }
+
+    // Connect the audio source directly to the output, bypassing other nodes
+    this.source.disconnect();
+    this.source.connect(this.context.destination);
+
+    for (const node of this.getAudioNodes()) {
+      node.disconnect();
+    }
+  }
+
   enable() {
     if (!this.source) {
       return;
@@ -81,13 +111,7 @@ class VoiceFocusConfig {
     }
 
     if (!this.isEnabled) {
-      this.source.disconnect();
-
-      let lastNode: AudioNode = this.source;
-      for (const node of this.getAudioNodes()) {
-        lastNode = lastNode.connect(node);
-      }
-      lastNode.connect(this.context.destination);
+      this.connect();
       this.isEnabled = true;
     }
   }
@@ -98,12 +122,7 @@ class VoiceFocusConfig {
     }
 
     if (this.isEnabled) {
-      this.source.disconnect();
-      this.source.connect(this.context.destination);
-
-      for (const node of this.getAudioNodes()) {
-        node.disconnect();
-      }
+      this.disconnect();
       this.isEnabled = false;
     }
   }
