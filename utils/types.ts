@@ -34,10 +34,7 @@ export function isVoiceFocusAction(obj: unknown): obj is VoiceFocusAction {
   return Object.hasOwn(obj, 'action');
 }
 
-export type VoiceFocusOption =
-  | VoiceFocusGainOption
-  | VoiceFocusPanOption
-  | VoiceFocusCompressorOption;
+export type VoiceFocusOption = VoiceFocusGainOption | VoiceFocusPanOption;
 
 type VoiceFocusGainOption = {
   type: 'gain';
@@ -46,10 +43,5 @@ type VoiceFocusGainOption = {
 
 type VoiceFocusPanOption = {
   type: 'pan';
-  value: number;
-};
-
-type VoiceFocusCompressorOption = {
-  type: 'compressor';
   value: number;
 };

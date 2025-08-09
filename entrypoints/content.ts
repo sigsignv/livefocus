@@ -27,7 +27,6 @@ class VoiceFocusConfig {
   context: AudioContext;
   gainNode: GainNode;
   pannerNode: StereoPannerNode;
-  compressorNode: DynamicsCompressorNode;
   source?: MediaElementAudioSourceNode;
 
   options: VoiceFocusOption[];
@@ -37,10 +36,6 @@ class VoiceFocusConfig {
     this.context = new AudioContext();
     this.gainNode = this.context.createGain();
     this.pannerNode = this.context.createStereoPanner();
-    this.compressorNode = new DynamicsCompressorNode(this.context, {
-      threshold: 0,
-      ratio: 6,
-    });
 
     createMediaElementSource(this.context, media)
       .then((source) => {
@@ -63,9 +58,6 @@ class VoiceFocusConfig {
     }
     if (option.type === 'pan') {
       this.pannerNode.pan.value = option.value;
-    }
-    if (option.type === 'compressor') {
-      this.compressorNode.threshold.value = option.value;
     }
 
     this.options.push(option);
@@ -128,7 +120,7 @@ class VoiceFocusConfig {
   }
 
   getAudioNodes(): AudioNode[] {
-    const nodes = [this.compressorNode, this.gainNode, this.pannerNode];
+    const nodes = [this.gainNode, this.pannerNode];
 
     return nodes;
   }
@@ -136,7 +128,6 @@ class VoiceFocusConfig {
   reset() {
     this.gainNode.gain.value = 1.0;
     this.pannerNode.pan.value = 0.0;
-    this.compressorNode.threshold.value = 0.0;
     this.options = [];
   }
 }

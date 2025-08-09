@@ -26,8 +26,6 @@ const initialize = async () => {
   const r = results[0];
   const gain = r?.result?.state === 'active' ? pickOption(r.result.options, 'gain', 1) : 1;
   const pan = r?.result?.state === 'active' ? pickOption(r.result.options, 'pan', 0) : 0;
-  const threshold =
-    r?.result?.state === 'active' ? pickOption(r.result.options, 'compressor', 0) : 0;
 
   const root = document.getElementById('root');
   if (!root) {
@@ -36,7 +34,7 @@ const initialize = async () => {
 
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <App gain={gain} pan={pan} threshold={threshold} />
+      <App gain={gain} pan={pan} />
     </React.StrictMode>,
   );
 };
