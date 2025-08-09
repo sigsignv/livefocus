@@ -1,3 +1,9 @@
-# WXT + React
+# LiveFocus
 
-This template should help get you started developing with React in WXT.
+## Author
+
+- Sigsign <<sig@signote.cc>>
+
+## License
+
+Apache-2.0
