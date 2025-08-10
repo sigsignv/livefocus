@@ -16,10 +16,7 @@ function Pan({ pan }: Props) {
     }
 
     const currentTabId = await getCurrentTabId();
-    await browser.tabs.sendMessage<VoiceFocusAction>(currentTabId, {
-      action: 'apply',
-      option: { type: 'pan', value },
-    });
+    sendMessage('apply', { type: 'pan', value }, currentTabId);
   };
 
   return (

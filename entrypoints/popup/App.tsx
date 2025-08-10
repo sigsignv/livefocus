@@ -18,9 +18,7 @@ function App(props: Props) {
 
   const onReset = async () => {
     const currentTabId = await getCurrentTabId();
-    await browser.tabs.sendMessage<VoiceFocusAction>(currentTabId, {
-      action: 'reset',
-    });
+    await sendMessage('reset', undefined, currentTabId);
   };
 
   return (

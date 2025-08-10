@@ -148,32 +148,23 @@ export default defineContentScript({
 
     window.extVoiceFocus = new WeakMap();
 
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (!sender.id || sender.id !== browser.runtime.id) {
-        return;
-      }
-      if (!isVoiceFocusAction(message)) {
-        console.error('[VoiceFocus] Invalid message received:', message);
-        return;
-      }
-
-      if (message.action === 'reset') {
-        for (const key of getPlayableElements()) {
-          const config = window.extVoiceFocus.get(key);
-          if (config) {
-            config.disable();
-            config.reset();
-          }
+    onMessage('reset', () => {
+      for (const key of getPlayableElements()) {
+        const config = window.extVoiceFocus.get(key);
+        if (config) {
+          config.disable();
+          config.reset();
         }
       }
+    });
 
-      if (message.action === 'apply') {
-        for (const key of getPlayableElements()) {
-          const config = window.extVoiceFocus.get(key) ?? new VoiceFocusConfig(key);
-          config.apply(message.option);
-          config.enable();
-          window.extVoiceFocus.set(key, config);
-        }
+    onMessage('apply', (message) => {
+      const option = message.data;
+      for (const key of getPlayableElements()) {
+        const config = window.extVoiceFocus.get(key) ?? new VoiceFocusConfig(key);
+        config.apply(option);
+        config.enable();
+        window.extVoiceFocus.set(key, config);
       }
     });
 

@@ -16,10 +16,7 @@ function Gain({ gain }: Props) {
     }
 
     const currentTabId = await getCurrentTabId();
-    await browser.tabs.sendMessage<VoiceFocusAction>(currentTabId, {
-      action: 'apply',
-      option: { type: 'gain', value },
-    });
+    sendMessage('apply', { type: 'gain', value }, currentTabId);
   };
 
   return (
