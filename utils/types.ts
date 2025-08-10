@@ -16,24 +16,6 @@ export function isVoiceFocusState(obj: unknown): obj is VoiceFocusState {
   return Object.hasOwn(obj, 'state');
 }
 
-export type VoiceFocusAction = VoiceFocusApplyAction | VoiceFocusResetAction;
-
-type VoiceFocusApplyAction = {
-  action: 'apply';
-  option: VoiceFocusOption;
-};
-
-type VoiceFocusResetAction = {
-  action: 'reset';
-};
-
-export function isVoiceFocusAction(obj: unknown): obj is VoiceFocusAction {
-  if (typeof obj !== 'object' || obj === null) {
-    return false;
-  }
-  return Object.hasOwn(obj, 'action');
-}
-
 export type VoiceFocusOption = VoiceFocusGainOption | VoiceFocusPanOption;
 
 type VoiceFocusGainOption = {
