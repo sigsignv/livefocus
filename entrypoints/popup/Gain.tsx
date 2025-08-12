@@ -4,8 +4,8 @@ type Props = {
   gain?: number;
 };
 
-function Gain({ gain }: Props) {
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = async (ev) => {
+function Gain(props: Props) {
+  const onChange = async (ev: Event) => {
     const target = ev.target;
     if (!(target instanceof HTMLInputElement)) {
       return;
@@ -20,8 +20,8 @@ function Gain({ gain }: Props) {
   };
 
   return (
-    <div className="container">
-      <label htmlFor="gain">Gain:</label>
+    <div class="container">
+      <label for="gain">Gain:</label>
       <input
         type="range"
         id="gain"
@@ -29,7 +29,7 @@ function Gain({ gain }: Props) {
         max={2.0}
         step={0.1}
         list="default-gain"
-        defaultValue={gain ?? 1.0}
+        value={props.gain ?? 1.0}
         onChange={onChange}
       />
       <datalist id="default-gain">

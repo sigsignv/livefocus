@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { render } from 'solid-js/web';
 import { getActiveTabId } from '@/utils/tabs';
 import App from './App';
 
@@ -32,11 +31,7 @@ const initialize = async () => {
     throw new Error('[VoiceFocus] Root element not found');
   }
 
-  ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <App gain={gain} pan={pan} />
-    </React.StrictMode>,
-  );
+  render(() => <App gain={gain} pan={pan} />, root);
 };
 
 initialize().catch((err) => {

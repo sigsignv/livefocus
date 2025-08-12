@@ -8,8 +8,8 @@ type Props = {
 };
 
 function App(props: Props) {
-  const [gain, setGain] = useState(props.gain);
-  const [pan, setPan] = useState(props.pan);
+  const [gain, setGain] = createSignal(props.gain ?? 1.0);
+  const [pan, setPan] = createSignal(props.pan ?? 0.0);
 
   const onClick = () => {
     setGain(1.0);
@@ -23,9 +23,9 @@ function App(props: Props) {
 
   return (
     <form onReset={onReset}>
-      <Gain gain={gain} />
-      <Pan pan={pan} />
-      <div className="container">
+      <Gain gain={gain()} />
+      <Pan pan={pan()} />
+      <div class="container">
         <input type="reset" onClick={onClick} />
       </div>
     </form>
