@@ -1,4 +1,4 @@
-import { getCurrentTabId } from './activeTab';
+import { getActiveTabId } from '@/utils/tabs';
 
 type Props = {
   pan?: number;
@@ -15,7 +15,7 @@ function Pan({ pan }: Props) {
       return;
     }
 
-    const currentTabId = await getCurrentTabId();
+    const currentTabId = await getActiveTabId();
     sendMessage('apply', { type: 'pan', value }, currentTabId);
   };
 

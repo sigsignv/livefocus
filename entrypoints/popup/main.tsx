@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { getActiveTabId } from '@/utils/tabs';
 import App from './App';
-import { getCurrentTabId } from './activeTab';
 
 const pickOption = <T extends VoiceFocusOption['type']>(
   options: VoiceFocusOption[],
@@ -17,7 +17,7 @@ const pickOption = <T extends VoiceFocusOption['type']>(
 };
 
 const initialize = async () => {
-  const tabId = await getCurrentTabId();
+  const tabId = await getActiveTabId();
   const results = await browser.scripting.executeScript<[], VoiceFocusState>({
     target: { tabId },
     files: ['/content-scripts/content.js'],

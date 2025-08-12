@@ -1,4 +1,4 @@
-import { getCurrentTabId } from './activeTab';
+import { getActiveTabId } from '@/utils/tabs';
 import Gain from './Gain';
 import Pan from './Pan';
 
@@ -17,7 +17,7 @@ function App(props: Props) {
   };
 
   const onReset = async () => {
-    const currentTabId = await getCurrentTabId();
+    const currentTabId = await getActiveTabId();
     await sendMessage('reset', undefined, currentTabId);
   };
 
