@@ -6,5 +6,5 @@ export default defineConfig({
     name: 'LiveFocus',
     permissions: ['activeTab', 'scripting'],
   },
-  modules: ['@wxt-dev/module-react'],
+  modules: ['@wxt-dev/module-solid'],
 });

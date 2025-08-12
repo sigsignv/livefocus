@@ -4,8 +4,8 @@ type Props = {
   pan?: number;
 };
 
-function Pan({ pan }: Props) {
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = async (ev) => {
+function Pan(props: Props) {
+  const onChange = async (ev: Event) => {
     const target = ev.target;
     if (!(target instanceof HTMLInputElement)) {
       return;
@@ -20,8 +20,8 @@ function Pan({ pan }: Props) {
   };
 
   return (
-    <div className="container">
-      <label htmlFor="pan">Panner:</label>
+    <div class="container">
+      <label for="pan">Panner:</label>
       <input
         type="range"
         id="pan"
@@ -29,7 +29,7 @@ function Pan({ pan }: Props) {
         max={1.0}
         step={0.1}
         list="default-pan"
-        defaultValue={pan ?? 0.0}
+        value={props.pan ?? 0.0}
         onChange={onChange}
       />
       <datalist id="default-pan">
