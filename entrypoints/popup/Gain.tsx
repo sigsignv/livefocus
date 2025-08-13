@@ -16,7 +16,7 @@ function Gain(props: Props) {
     }
 
     const currentTabId = await getActiveTabId();
-    sendMessage('apply', { type: 'gain', value }, currentTabId);
+    sendMessage('setGain', value, currentTabId);
   };
 
   return (

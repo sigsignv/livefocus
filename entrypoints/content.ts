@@ -1,173 +1,86 @@
 declare global {
   interface Window {
-    extVoiceFocus: VoiceFocusMap;
+    extLiveFocus: LiveFocusState;
   }
 }
 
-type VoiceFocusMap = WeakMap<HTMLMediaElement, VoiceFocusConfig>;
-
-const createMediaElementSource = (ctx: AudioContext, media: HTMLMediaElement) => {
-  return new Promise<MediaElementAudioSourceNode>((resolv, reject) => {
-    const listener = (ev: Event) => {
-      try {
-        resolv(ctx.createMediaElementSource(ev.target as HTMLMediaElement));
-      } catch (ex) {
-        reject(ex);
-      }
-    };
-    media.addEventListener('timeupdate', listener, { once: true });
-  });
+type LiveFocusState = {
+  effectors: WeakMap<HTMLMediaElement, LiveFocusEffector>;
+  options: {
+    gain: number;
+    panner: number;
+  };
 };
 
-const getPlayableElements = () => {
-  return Array.from(document.querySelectorAll<HTMLMediaElement>('video, audio'));
-};
-
-class VoiceFocusConfig {
+type LiveFocusEffector = {
   context: AudioContext;
-  gainNode: GainNode;
-  pannerNode: StereoPannerNode;
-  source?: MediaElementAudioSourceNode;
+  nodes: {
+    source: MediaElementAudioSourceNode;
+    gain: GainNode;
+    panner: StereoPannerNode;
+  };
+};
 
-  options: VoiceFocusOption[];
-  isEnabled: boolean;
+function applyOptions() {
+  const { effectors, options } = window.extLiveFocus;
 
-  constructor(media: HTMLMediaElement) {
-    this.context = new AudioContext();
-    this.gainNode = this.context.createGain();
-    this.pannerNode = this.context.createStereoPanner();
+  for (const track of document.querySelectorAll<HTMLMediaElement>('video, audio')) {
+    const effector = effectors.get(track) ?? initEffector(track);
 
-    createMediaElementSource(this.context, media)
-      .then((source) => {
-        source.connect(this.context.destination);
-        this.source = source;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    effector.nodes.gain.gain.value = options.gain;
+    effector.nodes.panner.pan.value = options.panner;
 
-    this.options = [];
-    this.isEnabled = false;
+    effectors.set(track, effector);
   }
+}
 
-  apply(option: VoiceFocusOption) {
-    this.options = this.options.filter((o) => o.type !== option.type);
+function initEffector(track: HTMLMediaElement): LiveFocusEffector {
+  const context = new AudioContext();
+  const source = context.createMediaElementSource(track);
+  const gain = context.createGain();
+  const panner = context.createStereoPanner();
 
-    if (option.type === 'gain') {
-      this.gainNode.gain.value = option.value;
-    }
-    if (option.type === 'pan') {
-      this.pannerNode.pan.value = option.value;
-    }
+  source.connect(gain);
+  gain.connect(panner);
+  panner.connect(context.destination);
 
-    this.options.push(option);
-  }
-
-  connect() {
-    if (!this.source) {
-      return;
-    }
-
-    // Reset connections between all AudioNodes
-    this.disconnect();
-    this.source.disconnect();
-
-    let lastNode: AudioNode = this.source;
-    for (const node of this.getAudioNodes()) {
-      lastNode = lastNode.connect(node);
-    }
-    lastNode.connect(this.context.destination);
-  }
-
-  disconnect() {
-    if (!this.source) {
-      return;
-    }
-
-    // Connect the audio source directly to the output, bypassing other nodes
-    this.source.disconnect();
-    this.source.connect(this.context.destination);
-
-    for (const node of this.getAudioNodes()) {
-      node.disconnect();
-    }
-  }
-
-  enable() {
-    if (!this.source) {
-      return;
-    }
-
-    for (const option of this.options) {
-      this.apply(option);
-    }
-
-    if (!this.isEnabled) {
-      this.connect();
-      this.isEnabled = true;
-    }
-  }
-
-  disable() {
-    if (!this.source) {
-      return;
-    }
-
-    if (this.isEnabled) {
-      this.disconnect();
-      this.isEnabled = false;
-    }
-  }
-
-  getAudioNodes(): AudioNode[] {
-    const nodes = [this.gainNode, this.pannerNode];
-
-    return nodes;
-  }
-
-  reset() {
-    this.gainNode.gain.value = 1.0;
-    this.pannerNode.pan.value = 0.0;
-    this.options = [];
-  }
+  return {
+    context,
+    nodes: { source, gain, panner },
+  };
 }
 
 export default defineContentScript({
   registration: 'runtime',
-  matches: [],
-  async main(): Promise<VoiceFocusState> {
-    if (window.extVoiceFocus) {
-      for (const key of getPlayableElements()) {
-        const config = window.extVoiceFocus.get(key);
-        if (config) {
-          return { state: 'active', options: config.options };
-        }
-      }
-      return { state: 'active', options: [] };
+  main: () => {
+    if (window.extLiveFocus) {
+      return;
     }
+    window.extLiveFocus = {
+      effectors: new WeakMap(),
+      options: {
+        gain: 1.0,
+        panner: 0.0,
+      },
+    };
 
-    window.extVoiceFocus = new WeakMap();
+    onMessage('getOptions', () => {
+      return window.extLiveFocus.options;
+    });
+
+    onMessage('setGain', ({ data }) => {
+      window.extLiveFocus.options.gain = data;
+      applyOptions();
+    });
+
+    onMessage('setPan', ({ data }) => {
+      window.extLiveFocus.options.panner = data;
+      applyOptions();
+    });
 
     onMessage('reset', () => {
-      for (const key of getPlayableElements()) {
-        const config = window.extVoiceFocus.get(key);
-        if (config) {
-          config.disable();
-          config.reset();
-        }
-      }
+      window.extLiveFocus.options = { gain: 1.0, panner: 0.0 };
+      applyOptions();
     });
-
-    onMessage('apply', (message) => {
-      const option = message.data;
-      for (const key of getPlayableElements()) {
-        const config = window.extVoiceFocus.get(key) ?? new VoiceFocusConfig(key);
-        config.apply(option);
-        config.enable();
-        window.extVoiceFocus.set(key, config);
-      }
-    });
-
-    return { state: 'ready' };
   },
 });

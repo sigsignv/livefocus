@@ -16,7 +16,7 @@ function Pan(props: Props) {
     }
 
     const currentTabId = await getActiveTabId();
-    sendMessage('apply', { type: 'pan', value }, currentTabId);
+    sendMessage('setPan', value, currentTabId);
   };
 
   return (
