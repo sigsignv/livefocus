@@ -72,12 +72,12 @@ export default defineContentScript({
     });
 
     onMessage('setGain', ({ data }) => {
-      window.extLiveFocus.options.gain = data;
+      window.extLiveFocus.options.gain = data.value;
       applyOptions();
     });
 
     onMessage('setPan', ({ data }) => {
-      window.extLiveFocus.options.panner = data;
+      window.extLiveFocus.options.panner = data.value;
       applyOptions();
     });
 

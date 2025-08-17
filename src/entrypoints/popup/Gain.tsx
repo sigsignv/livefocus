@@ -16,7 +16,7 @@ function Gain(props: Props) {
       return;
     }
 
-    sendMessage('setGain', value, props.tabId);
+    sendMessage('setGain', { state: 'focus', value }, props.tabId);
   };
 
   return (

@@ -16,7 +16,7 @@ function Pan(props: Props) {
       return;
     }
 
-    sendMessage('setPan', value, props.tabId);
+    sendMessage('setPan', { state: 'focus', value }, props.tabId);
   };
 
   return (
