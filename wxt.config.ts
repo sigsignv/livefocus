@@ -7,4 +7,5 @@ export default defineConfig({
     permissions: ['activeTab', 'scripting'],
   },
   modules: ['@wxt-dev/module-solid'],
+  srcDir: 'src',
 });
