@@ -1,3 +1,5 @@
+import { sendMessage } from '@/utils/messaging';
+
 type Props = {
   gain?: number;
   tabId: number;

@@ -1,3 +1,6 @@
+import { createSignal } from 'solid-js';
+import { sendMessage } from '@/utils/messaging';
+
 import Gain from './Gain';
 import Pan from './Pan';
 

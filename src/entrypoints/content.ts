@@ -1,3 +1,6 @@
+import { defineContentScript } from '#imports';
+import { onMessage } from '@/utils/messaging';
+
 declare global {
   interface Window {
     extLiveFocus: LiveFocusState;
