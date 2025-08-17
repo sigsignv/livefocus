@@ -25,11 +25,11 @@ function App(props: Props) {
 
   return (
     <form onReset={onReset}>
-      <Gain gain={gain()} tabId={props.tabId} />
-      <Pan pan={pan()} tabId={props.tabId} />
       <div class="container">
         <input type="reset" onClick={onClick} />
       </div>
+      <Gain gain={gain()} tabId={props.tabId} />
+      <Pan pan={pan()} tabId={props.tabId} />
     </form>
   );
 }
