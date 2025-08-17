@@ -1,7 +1,6 @@
-import { getActiveTabId } from '@/utils/tabs';
-
 type Props = {
   gain?: number;
+  tabId: number;
 };
 
 function Gain(props: Props) {
@@ -15,8 +14,7 @@ function Gain(props: Props) {
       return;
     }
 
-    const currentTabId = await getActiveTabId();
-    sendMessage('apply', { type: 'gain', value }, currentTabId);
+    sendMessage('setGain', value, props.tabId);
   };
 
   return (

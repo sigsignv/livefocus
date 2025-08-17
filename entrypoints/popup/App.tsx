@@ -1,10 +1,10 @@
-import { getActiveTabId } from '@/utils/tabs';
 import Gain from './Gain';
 import Pan from './Pan';
 
 type Props = {
   gain?: number;
   pan?: number;
+  tabId: number;
 };
 
 function App(props: Props) {
@@ -17,14 +17,13 @@ function App(props: Props) {
   };
 
   const onReset = async () => {
-    const currentTabId = await getActiveTabId();
-    await sendMessage('reset', undefined, currentTabId);
+    await sendMessage('reset', undefined, props.tabId);
   };
 
   return (
     <form onReset={onReset}>
-      <Gain gain={gain()} />
-      <Pan pan={pan()} />
+      <Gain gain={gain()} tabId={props.tabId} />
+      <Pan pan={pan()} tabId={props.tabId} />
       <div class="container">
         <input type="reset" onClick={onClick} />
       </div>
