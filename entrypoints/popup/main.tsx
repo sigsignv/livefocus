@@ -16,7 +16,7 @@ const initialize = async () => {
     throw new Error('[LiveFocus] Root element not found');
   }
 
-  render(() => <App gain={gain} pan={pan} />, root);
+  render(() => <App gain={gain} pan={pan} tabId={tabId} />, root);
 };
 
 initialize().catch((err) => {
