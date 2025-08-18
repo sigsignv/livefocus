@@ -18,4 +18,5 @@ export type LiveFocusOption<T> = {
   value: T;
 };
 
-export const { sendMessage, onMessage } = defineExtensionMessaging<LiveFocusMessaging>();
+export const { sendMessage, onMessage, removeAllListeners } =
+  defineExtensionMessaging<LiveFocusMessaging>();

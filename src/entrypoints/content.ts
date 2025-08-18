@@ -1,5 +1,5 @@
 import { defineContentScript } from '#imports';
-import { onMessage } from '@/utils/messaging';
+import { onMessage, removeAllListeners } from '@/utils/messaging';
 
 declare global {
   interface Window {
@@ -55,11 +55,8 @@ function initEffector(track: HTMLMediaElement): LiveFocusEffector {
 
 export default defineContentScript({
   registration: 'runtime',
-  main: () => {
-    if (window.extLiveFocus) {
-      return;
-    }
-    window.extLiveFocus = {
+  main: (ctx) => {
+    window.extLiveFocus ??= {
       effectors: new WeakMap(),
       options: {
         gain: 1.0,
@@ -85,5 +82,7 @@ export default defineContentScript({
       window.extLiveFocus.options = { gain: 1.0, panner: 0.0 };
       applyOptions();
     });
+
+    ctx.onInvalidated(() => removeAllListeners());
   },
 });
