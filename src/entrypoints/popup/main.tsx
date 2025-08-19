@@ -1,8 +1,8 @@
 import { render } from 'solid-js/web';
 import { browser } from 'wxt/browser';
+import App from '@/components/App';
 import { sendMessage } from '@/utils/messaging';
 import { getActiveTabId } from '@/utils/tabs';
-import App from './App';
 
 const initialize = async () => {
   const tabId = await getActiveTabId();
