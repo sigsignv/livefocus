@@ -1,7 +1,9 @@
 import { sendMessage } from '@/utils/messaging';
+import type { FocusState } from '@/utils/types';
 
 type Props = {
   pan?: number;
+  state: FocusState;
   tabId: number;
 };
 
@@ -16,7 +18,7 @@ function Pan(props: Props) {
       return;
     }
 
-    sendMessage('setPan', { state: 'focus', value }, props.tabId);
+    sendMessage('setPan', { state: props.state, value }, props.tabId);
   };
 
   return (

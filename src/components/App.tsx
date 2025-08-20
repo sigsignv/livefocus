@@ -28,8 +28,8 @@ function App(props: Props) {
       <div class="container">
         <input type="reset" onClick={onClick} />
       </div>
-      <Gain gain={gain()} tabId={props.tabId} />
-      <Pan pan={pan()} tabId={props.tabId} />
+      <Gain gain={gain()} state="focus" tabId={props.tabId} />
+      <Pan pan={pan()} state="focus" tabId={props.tabId} />
     </form>
   );
 }
