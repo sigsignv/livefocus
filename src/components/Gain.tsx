@@ -18,7 +18,7 @@ function Gain(props: Props) {
       return;
     }
 
-    sendMessage('setGain', { state: props.state, value }, props.tabId);
+    sendMessage('setGain', { kind: 'gain', state: props.state, value }, props.tabId);
   };
 
   return (

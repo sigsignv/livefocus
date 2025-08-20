@@ -1,21 +1,16 @@
 import { defineExtensionMessaging } from '@webext-core/messaging';
-import type { FocusState } from './types';
+import type { LiveFocusOption } from './types';
 
 interface LiveFocusMessaging {
   getOptions(): LiveFocusOptions;
-  setGain(option: LiveFocusOption<number>): void;
-  setPan(option: LiveFocusOption<number>): void;
+  setGain(option: LiveFocusOption<'gain'>): void;
+  setPan(option: LiveFocusOption<'panner'>): void;
   reset(): void;
 }
 
 type LiveFocusOptions = {
   gain: number;
   panner: number;
-};
-
-export type LiveFocusOption<T> = {
-  state: FocusState;
-  value: T;
 };
 
 export const { sendMessage, onMessage, removeAllListeners } =

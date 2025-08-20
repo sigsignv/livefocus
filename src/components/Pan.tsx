@@ -18,7 +18,7 @@ function Pan(props: Props) {
       return;
     }
 
-    sendMessage('setPan', { state: props.state, value }, props.tabId);
+    sendMessage('setPan', { kind: 'panner', state: props.state, value }, props.tabId);
   };
 
   return (
