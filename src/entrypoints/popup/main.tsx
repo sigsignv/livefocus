@@ -1,7 +1,6 @@
 import { render } from 'solid-js/web';
 import { browser } from 'wxt/browser';
 import App from '@/components/App';
-import { sendMessage } from '@/utils/messaging';
 import { getActiveTabId } from '@/utils/tabs';
 
 const initialize = async () => {
@@ -11,14 +10,12 @@ const initialize = async () => {
     files: ['/content-scripts/content.js'],
   });
 
-  const { gain, panner: pan } = await sendMessage('getOptions', undefined, tabId);
-
   const root = document.getElementById('root');
   if (!root) {
     throw new Error('[LiveFocus] Root element not found');
   }
 
-  render(() => <App gain={gain} pan={pan} tabId={tabId} />, root);
+  render(() => <App tabId={tabId} />, root);
 };
 
 initialize().catch((err) => {

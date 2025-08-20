@@ -1,18 +1,22 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { sendMessage } from '@/utils/messaging';
 
 import Gain from './Gain';
 import Pan from './Pan';
 
 type Props = {
-  gain?: number;
-  pan?: number;
   tabId: number;
 };
 
 function App(props: Props) {
-  const [gain, setGain] = createSignal(props.gain ?? 1.0);
-  const [pan, setPan] = createSignal(props.pan ?? 0.0);
+  const [gain, setGain] = createSignal(1.0);
+  const [pan, setPan] = createSignal(0.0);
+
+  onMount(async () => {
+    const { gain, panner } = await sendMessage('getOptions', undefined, props.tabId);
+    setGain(gain);
+    setPan(panner);
+  });
 
   const onClick = () => {
     setGain(1.0);
