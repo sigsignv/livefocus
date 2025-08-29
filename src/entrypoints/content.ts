@@ -1,5 +1,7 @@
 import { defineContentScript } from '#imports';
 import { onMessage, removeAllListeners } from '@/utils/messaging';
+import type { LiveFocusOptions } from '@/utils/option';
+import { findOption, updateOption } from '@/utils/option';
 
 declare global {
   interface Window {
@@ -9,10 +11,7 @@ declare global {
 
 type LiveFocusState = {
   effectors: WeakMap<HTMLMediaElement, LiveFocusEffector>;
-  options: {
-    gain: number;
-    panner: number;
-  };
+  options: LiveFocusOptions;
 };
 
 type LiveFocusEffector = {
@@ -30,8 +29,11 @@ function applyOptions() {
   for (const track of document.querySelectorAll<HTMLMediaElement>('video, audio')) {
     const effector = effectors.get(track) ?? initEffector(track);
 
-    effector.nodes.gain.gain.value = options.gain;
-    effector.nodes.panner.pan.value = options.panner;
+    const gain = findOption(options, 'gain');
+    effector.nodes.gain.gain.value = gain?.value ?? 1.0;
+
+    const panner = findOption(options, 'panner');
+    effector.nodes.panner.pan.value = panner?.value ?? 0.0;
 
     effectors.set(track, effector);
   }
@@ -58,28 +60,28 @@ export default defineContentScript({
   main: (ctx) => {
     window.extLiveFocus ??= {
       effectors: new WeakMap(),
-      options: {
-        gain: 1.0,
-        panner: 0.0,
-      },
+      options: [],
     };
 
     onMessage('getOptions', () => {
-      return window.extLiveFocus.options;
+      const { options } = window.extLiveFocus;
+      const gain = findOption(options, 'gain')?.value ?? 1.0;
+      const panner = findOption(options, 'panner')?.value ?? 0.0;
+      return { gain, panner };
     });
 
     onMessage('setGain', ({ data }) => {
-      window.extLiveFocus.options.gain = data.value;
+      window.extLiveFocus.options = updateOption(window.extLiveFocus.options, data);
       applyOptions();
     });
 
     onMessage('setPan', ({ data }) => {
-      window.extLiveFocus.options.panner = data.value;
+      window.extLiveFocus.options = updateOption(window.extLiveFocus.options, data);
       applyOptions();
     });
 
     onMessage('reset', () => {
-      window.extLiveFocus.options = { gain: 1.0, panner: 0.0 };
+      window.extLiveFocus.options = [];
       applyOptions();
     });
 
