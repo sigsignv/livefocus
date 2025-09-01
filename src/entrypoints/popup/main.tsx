@@ -1,16 +1,12 @@
 import { render } from 'solid-js/web';
-import { browser } from 'wxt/browser';
+import { browser } from '#imports';
 import App from '@/components/App';
 
 async function getActiveTabId(): Promise<number> {
-  const tabs = await browser.tabs.query({ currentWindow: true, active: true });
-  if (tabs.length !== 1) {
-    throw new Error('Unable to get active tab');
-  }
-
-  const tabId = tabs[0].id;
-  if (typeof tabId !== 'number') {
-    throw new Error('tabId is not a number');
+  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+  const tabId = tabs[0]?.id;
+  if (!tabId) {
+    throw new Error('Unable to get active tab id');
   }
 
   return tabId;
