@@ -1,9 +1,10 @@
 import { defineExtensionMessaging } from '@webext-core/messaging';
+import type { LiveFocusOption } from './option';
 
 interface LiveFocusMessaging {
   getOptions(): LiveFocusOptions;
-  setGain(value: number): void;
-  setPan(value: number): void;
+  setGain(option: LiveFocusOption<'gain'>): void;
+  setPan(option: LiveFocusOption<'panner'>): void;
   reset(): void;
 }
 
@@ -12,4 +13,5 @@ type LiveFocusOptions = {
   panner: number;
 };
 
-export const { sendMessage, onMessage } = defineExtensionMessaging<LiveFocusMessaging>();
+export const { sendMessage, onMessage, removeAllListeners } =
+  defineExtensionMessaging<LiveFocusMessaging>();
