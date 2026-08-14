@@ -1,1 +1,1 @@
-export type FocusState = 'focus' | 'blur';
+export type FocusState = "focus" | "blur";

@@ -1,12 +1,12 @@
-import { defineConfig } from 'wxt';
+import { defineConfig } from "wxt";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   manifest: {
-    name: 'LiveFocus',
-    permissions: ['activeTab', 'scripting'],
+    name: "LiveFocus",
+    permissions: ["activeTab", "scripting"],
   },
-  modules: ['@wxt-dev/module-solid'],
-  srcDir: 'src',
+  modules: ["@wxt-dev/module-solid"],
+  srcDir: "src",
   imports: false,
 });
