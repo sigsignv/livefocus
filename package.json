@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@webext-core/messaging": "^2.3.0",
-    "solid-js": "^1.9.12"
+    "solid-js": "^1.9.14"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
