@@ -17,7 +17,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "@webext-core/messaging": "^2.3.0",
+    "@webext-core/messaging": "^4.0.0",
     "solid-js": "^1.9.14"
   },
   "devDependencies": {
