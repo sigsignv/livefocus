@@ -1,8 +1,8 @@
-import { createSignal, onMount } from 'solid-js';
-import { sendMessage } from '@/utils/messaging';
+import { createSignal, onMount } from "solid-js";
+import { sendMessage } from "@/utils/messaging";
 
-import Gain from './Gain';
-import Pan from './Pan';
+import Gain from "./Gain";
+import Pan from "./Pan";
 
 type Props = {
   tabId: number;
@@ -13,7 +13,11 @@ function App(props: Props) {
   const [pan, setPan] = createSignal(0.0);
 
   onMount(async () => {
-    const { gain, panner } = await sendMessage('getOptions', undefined, props.tabId);
+    const { gain, panner } = await sendMessage(
+      "getOptions",
+      undefined,
+      props.tabId,
+    );
     setGain(gain);
     setPan(panner);
   });
@@ -24,7 +28,7 @@ function App(props: Props) {
   };
 
   const onReset = async () => {
-    await sendMessage('reset', undefined, props.tabId);
+    await sendMessage("reset", undefined, props.tabId);
   };
 
   return (

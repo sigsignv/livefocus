@@ -17,8 +17,15 @@ export type LiveFocusOption<T extends AudioNodeType> = {
 
 export type LiveFocusOptions = LiveFocusOption<AudioNodeType>[];
 
-export function findOption<T extends AudioNodeType>(array: LiveFocusOptions, kind: T) {
-  return array.find((option): option is LiveFocusOption<T> => option.kind === kind) ?? null;
+export function findOption<T extends AudioNodeType>(
+  array: LiveFocusOptions,
+  kind: T,
+) {
+  return (
+    array.find(
+      (option): option is LiveFocusOption<T> => option.kind === kind,
+    ) ?? null
+  );
 }
 
 export function updateOption<T extends AudioNodeType>(

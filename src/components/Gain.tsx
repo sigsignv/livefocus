@@ -1,5 +1,5 @@
-import { sendMessage } from '@/utils/messaging';
-import type { FocusState } from '@/utils/types';
+import { sendMessage } from "@/utils/messaging";
+import type { FocusState } from "@/utils/types";
 
 type Props = {
   gain?: number;
@@ -18,7 +18,11 @@ function Gain(props: Props) {
       return;
     }
 
-    sendMessage('setGain', { kind: 'gain', state: props.state, value }, props.tabId);
+    sendMessage(
+      "setGain",
+      { kind: "gain", state: props.state, value },
+      props.tabId,
+    );
   };
 
   return (

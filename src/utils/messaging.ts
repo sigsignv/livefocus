@@ -1,10 +1,10 @@
-import { defineExtensionMessaging } from '@webext-core/messaging';
-import type { LiveFocusOption } from './option';
+import { defineExtensionMessaging } from "@webext-core/messaging";
+import type { LiveFocusOption } from "./option";
 
 interface LiveFocusMessaging {
   getOptions(): LiveFocusOptions;
-  setGain(option: LiveFocusOption<'gain'>): void;
-  setPan(option: LiveFocusOption<'panner'>): void;
+  setGain(option: LiveFocusOption<"gain">): void;
+  setPan(option: LiveFocusOption<"panner">): void;
   reset(): void;
 }
 
