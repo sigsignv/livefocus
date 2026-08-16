@@ -1,15 +1,16 @@
 import { render } from "solid-js/web";
 import { browser } from "#imports";
 import App from "@/components/App";
+import { getActiveTabInfo } from "@/utils/tab";
 
 async function getActiveTabId(): Promise<number> {
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-  const tabId = tabs[0]?.id;
-  if (!tabId) {
+  try {
+    const tab = await getActiveTabInfo();
+    return tab.id;
+  } catch (error) {
+    console.error("Failed fetching active tab info:", error);
     throw new Error("Unable to get active tab id");
   }
-
-  return tabId;
 }
 
 const tabId = await getActiveTabId();
