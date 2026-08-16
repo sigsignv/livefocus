@@ -1,14 +1,17 @@
 import { createSignal, onMount } from "solid-js";
 import { sendMessage } from "@/utils/messaging";
+import type { ActiveTabInfo } from "@/utils/tab";
 
 import Gain from "./Gain";
 import Pan from "./Pan";
+import TabInfo from "./TabInfo";
 
 type Props = {
-  tabId: number;
+  activeTabInfo: ActiveTabInfo;
 };
 
 function App(props: Props) {
+  const tabId = () => props.activeTabInfo.id;
   const [gain, setGain] = createSignal(1.0);
   const [pan, setPan] = createSignal(0.0);
 
@@ -16,7 +19,7 @@ function App(props: Props) {
     const { gain, panner } = await sendMessage(
       "getOptions",
       undefined,
-      props.tabId,
+      tabId(),
     );
     setGain(gain);
     setPan(panner);
@@ -28,16 +31,19 @@ function App(props: Props) {
   };
 
   const onReset = async () => {
-    await sendMessage("reset", undefined, props.tabId);
+    await sendMessage("reset", undefined, tabId());
   };
 
   return (
     <form onReset={onReset}>
+      {props.activeTabInfo.kind === "split-view" && (
+        <TabInfo tab={props.activeTabInfo} />
+      )}
       <div class="container">
         <input type="reset" onClick={onClick} />
       </div>
-      <Gain gain={gain()} state="focus" tabId={props.tabId} />
-      <Pan pan={pan()} state="focus" tabId={props.tabId} />
+      <Gain gain={gain()} state="focus" tabId={tabId()} />
+      <Pan pan={pan()} state="focus" tabId={tabId()} />
     </form>
   );
 }
